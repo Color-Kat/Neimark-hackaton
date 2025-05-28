@@ -1,24 +1,21 @@
-include:
-  - ./monitoring/docker-compose.yml
-
 services:
-  api-gateway:
-    container_name: api-gateway
+  api:
+    container_name: api
     build:
       context: .
-      dockerfile: ./apps/api-gateway/Dockerfile.dev
+      dockerfile: ./apps/api/Dockerfile.dev
     ports:
       - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
     volumes:
-      - ./apps/api-gateway:/app/apps/api-gateway
+      - ./apps/api:/app/apps/api
       - ./libs:/app/libs
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}?schema=public
     env_file:
       - .env
     depends_on:
       - db
-      - kafka
 
   web:
     build:
@@ -36,58 +33,17 @@ services:
     env_file:
       - .env
 
-  scan:
-    container_name: scan
+  python:
+    container_name: python
     build:
-      context: .
-      dockerfile: ./apps/scan/Dockerfile.dev
-    ports:
-      - ${SCAN_PORT}:${SCAN_PORT}
-    volumes:
-      - ./apps/scan:/app/apps/scan
-      - ./libs:/app/libs
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${SCAN_DB_NAME}?schema=public
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - kafka
-
-  product-analyzer:
-    container_name: product-analyzer
-    build:
-      context: .
-      dockerfile: ./apps/product-analyzer/Dockerfile.dev
-    ports:
-      - ${PRODUCT_ANALYZER_PORT}:${PRODUCT_ANALYZER_PORT}
-    volumes:
-      - ./apps/product-analyzer:/app/apps/product-analyzer
-      - ./libs:/app/libs
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${PRODUCT_ANALYZER_DB_NAME}?schema=public
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - kafka
-      - redis
-
-  ingredients-recognition:
-    container_name: ingredients-recognition
-    build:
-      context: ./apps/ingredients-recognition
+      context: ./apps/python
       dockerfile: Dockerfile.dev
     ports:
-      - ${INGREDIENTS_RECOGNITION_PORT}:${INGREDIENTS_RECOGNITION_PORT}
+      - ${PYTHON_PORT}:${PYTHON_PORT}
     volumes:
-      - ./apps/ingredients-recognition:/app
+      - ./apps/python:/app
     env_file:
       - .env
-    depends_on:
-      - kafka
 
   # === Additional services === #
 
@@ -101,44 +57,5 @@ services:
       - ${DB_PORT}:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
-  redis:
-    container_name: redis
-    image: redis:7.4-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    restart: always
-
-  kafka:
-    image: apache/kafka-native:4.0.0
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
-      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
-    attach: false # don't show logs
-
-#  kafka-ui:
-#    container_name: kafka-ui
-#    image: provectuslabs/kafka-ui:latest
-#    ports:
-#      - "9000:8080"
-#    environment:
-#      KAFKA_CLUSTERS_0_NAME: local
-#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-#      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:22181
-
 volumes:
   postgres-data:
-  redis-data:
-  kafka-data:

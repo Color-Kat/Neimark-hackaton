@@ -1,0 +1,27 @@
+FROM node:23-alpine
+
+WORKDIR /app
+
+# Copy monorepo shared config and deps
+COPY tsconfig*.json ./
+COPY package*.json ./
+RUN npm install
+
+# Copy web app files
+COPY libs ./libs/
+
+WORKDIR /app/apps/web
+
+COPY apps/web/tsconfig*.json ./
+COPY apps/web/package*.json ./
+
+# Install all dependencies (including devDependencies)
+RUN npm install --verbose
+
+# Copy web app files
+COPY apps/web ./
+
+EXPOSE ${WEB_PORT}
+
+#CMD ["rm", "-rf", "node_modules"]
+CMD ["sh", "-c", "npm run dev -- --port ${WEB_PORT}"]

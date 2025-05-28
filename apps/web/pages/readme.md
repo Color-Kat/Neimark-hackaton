@@ -1,0 +1,1 @@
+This folder created to exclude src/pages folder from nextjs pages-router

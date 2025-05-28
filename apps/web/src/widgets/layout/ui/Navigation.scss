@@ -1,0 +1,43 @@
+nav.bottom-navigation {
+    .liquid-wrapper {
+        // Overflow hidden bottom
+        position: absolute;
+        height: 500%;
+        width: 100%;
+        bottom: 0;
+        overflow: hidden;
+    }
+
+    .liquid-container {
+        // Overflow hidden bottom
+        width: 100%;
+        height: 20%;
+        top: 80%;
+
+        position: relative;
+        filter: url('#liquid-svg');
+
+        .liquid {
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+
+            &:before {
+                content: '';
+                position: absolute;
+                inset: -50px;
+                border-radius: 50%;
+                z-index: -1;
+                filter: blur(50px);
+                background: #fff;
+            }
+        }
+
+        #liquid-svg {
+            width: 0;
+            height: 0;
+            user-select: none;
+            pointer-events: none;
+        }
+    }
+}

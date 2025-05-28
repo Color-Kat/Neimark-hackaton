@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@plugin './hero.ts';
+
+@source '../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+    --font-inter: 'Inter';
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+}
+
+@theme {
+    --color-accent-green: #7ea54a;
+    --color-accent-coral: #e85a3e;
+    --color-accent-lightgreen: #8bc249;
+    --color-primary-white: #fff7eb;
+    --color-primary-dark: #282828;
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*@media (orientation: landscape) {*/
+/*    body {*/
+/*        transform: rotate(-90deg);*/
+/*        transform-origin: left top;*/
+/*        width: 100vh;*/
+/*        height: 100vw;*/
+/*        overflow-x: hidden;*/
+/*        position: absolute;*/
+/*        top: 100%;*/
+/*        left: 0;*/
+/*    }*/
+/*}*/

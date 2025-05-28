@@ -11,9 +11,6 @@ COPY . .
 
 EXPOSE 3040
 
-# CMD ["python", "main.py"]
-# CMD ["watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "python", "main.py"]
-
 # Set env var to ensure logs are visible in real-time
 ENV PYTHONUNBUFFERED=1
 
